@@ -1,25 +1,28 @@
+import mongoose from "mongoose";
 
-import mongoose, { connect } from "mongoose";
+let cached = global.mongoose;
 
-let cached = global.mongoose
-
-if(!cached){
-    cached = global.mongoose = {conn :null , Promise : null}
-}
-async function ConnectDb(){
-    if(cached.conn){
-        return cached.conn
-    }
-    if(!cached){
-        const opts = {
-            bufferCommands : false 
-        }
-        cached.Promise = (await mongoose.connect(`${process.env.MONGODB_UR}/quickcart`, Opts)).isObjectIdOrHexString(mongoose=>{
-            return mongoose
-        })
-    }
-    cached.conn = await cached.Promise
-    return cached.conn
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
-export default connectDB
+async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
+
+    cached.promise = mongoose
+      .connect(`${process.env.MONGODB_UR}/quickcart`, opts)
+      .then((mongoose) => mongoose);
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export default connectDB;
